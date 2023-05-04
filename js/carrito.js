@@ -3,9 +3,9 @@ const productosTalles = document.querySelectorAll('.card');
 const carrito = document.querySelector('.listado');
 const contadorCarrito = document.querySelector('#valorCarrito');
 const precioTotal = document.querySelector('#precioTotal');
-
 let cantidadProductos = 0;
 let carritoProductos = [];
+
 //VERIFICAR LOCALSLORAGE
 if (localStorage.getItem('carritoProductos')){
     carritoProductos = JSON.parse(localStorage.getItem('carritoProductos'));
@@ -13,11 +13,13 @@ if (localStorage.getItem('carritoProductos')){
     actualizarCarrito();
     actualizarPrecioTotal();
 }
+
 //GUARDAR PRODUCTOS EN LOCALSTORAGE
 function guardarProductosEnLocalStorage() {
     localStorage.setItem('carritoProductos',JSON.stringify(carritoProductos));
     localStorage.setItem('cantidadProductos', cantidadProductos);
 }
+
 //ACTUALIZAR CARRITO
 function actualizarCarrito() {
     carrito.innerHTML = '';
@@ -38,6 +40,7 @@ function actualizarCarrito() {
     });
     contadorCarrito.textContent = cantidadTotalProductos;
 }
+
 //ACTUALIZAR PRECIO TOTAL
 function actualizarPrecioTotal() {
     let precioTotalCarrito = 0;
@@ -50,6 +53,7 @@ function actualizarPrecioTotal() {
     });
     precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
 }
+
 //ELIMINAR PRODUCTOS DEL CARRITO
 carrito.addEventListener('click', (event) => {
     if (event.target.classList.contains('eliminar-producto')) {

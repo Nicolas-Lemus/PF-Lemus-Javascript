@@ -8,7 +8,6 @@ inputPrecioMaximo.addEventListener('input', function() {
     const precioMaximo = parseInt(this.value);
     filtrarPorPrecio(precioMaximo);
 });
-
 const productos = document.querySelectorAll('.card');
 function filtrarPorPrecio(precioMaximo) {
     for (let i = 0; i < productos.length; i++) {
@@ -21,6 +20,7 @@ function filtrarPorPrecio(precioMaximo) {
         }
     }
 }
+
 //talles
 const talles = [40, 41, 42, 43, 44];
 //querySelectors
@@ -89,6 +89,7 @@ if (localStorage.getItem('carritoProductos')){
     actualizarCarrito();
     actualizarPrecioTotal();
 }
+
 //GUARDAR PRODUCTOS EN LOCALSTORAGE
 function guardarProductosEnLocalStorage() {
     localStorage.setItem('carritoProductos',JSON.stringify(carritoProductos));
@@ -122,10 +123,8 @@ productosTalles.forEach((producto) => {
     const precioProducto = parseFloat(producto.querySelector('.card-text').textContent.replace('Precio: $',''));
     const botonesTalles = producto.querySelectorAll('.btn-outline-secondary');
     const imgProducto = producto.querySelector(".card-img-top").src;
-
     let talleSeleccionado;
     
-
     botonesTalles.forEach(botonTalle => {
         botonTalle.addEventListener('click', () => {
             botonesTalles.forEach(boton => {
@@ -173,7 +172,6 @@ productosTalles.forEach((producto) => {
 function agregarProductoAlCarrito(nombreProducto,precioProducto, talleSeleccionado, imgProducto) {
     // Buscar si el producto ya existe en el carrito 
     const productoExistente = carritoProductos.find(producto => producto.nombre === nombreProducto && producto.talle === talleSeleccionado);
-    
     if (productoExistente) {
         // Si el producto ya existe, sumar 1 a la cantidad y actualizar el precio
         productoExistente.cantidad++;
