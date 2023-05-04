@@ -1,5 +1,4 @@
 const talles = [40, 41, 42, 43, 44];
-
 const productosTalles = document.querySelectorAll('.card');
 const carrito = document.querySelector('.listado');
 const contadorCarrito = document.querySelector('#valorCarrito');
@@ -7,19 +6,19 @@ const precioTotal = document.querySelector('#precioTotal');
 
 let cantidadProductos = 0;
 let carritoProductos = [];
-
+//VERIFICAR LOCALSLORAGE
 if (localStorage.getItem('carritoProductos')){
     carritoProductos = JSON.parse(localStorage.getItem('carritoProductos'));
     cantidadProductos = carritoProductos.reduce((total, producto) => total + producto.cantidad, 0);
     actualizarCarrito();
     actualizarPrecioTotal();
 }
-
+//GUARDAR PRODUCTOS EN LOCALSTORAGE
 function guardarProductosEnLocalStorage() {
     localStorage.setItem('carritoProductos',JSON.stringify(carritoProductos));
     localStorage.setItem('cantidadProductos', cantidadProductos);
 }
-
+//ACTUALIZAR CARRITO
 function actualizarCarrito() {
     carrito.innerHTML = '';
     let cantidadTotalProductos = 0;
@@ -39,10 +38,9 @@ function actualizarCarrito() {
     });
     contadorCarrito.textContent = cantidadTotalProductos;
 }
-
+//ACTUALIZAR PRECIO TOTAL
 function actualizarPrecioTotal() {
     let precioTotalCarrito = 0;
-
     const preciosProductos = document.querySelectorAll('.precio');
     preciosProductos.forEach(precioProducto => {
         const precioProductoNumerico = parseFloat(precioProducto.textContent.replace('Precio: $', ''));
@@ -52,14 +50,13 @@ function actualizarPrecioTotal() {
     });
     precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
 }
-
+//ELIMINAR PRODUCTOS DEL CARRITO
 carrito.addEventListener('click', (event) => {
     if (event.target.classList.contains('eliminar-producto')) {
         const index = event.target.dataset.index;
         const producto = carritoProductos[index];
         if (producto.cantidad > 1) {
-            producto.precio = producto.cantidad / producto.precio;
-            /* actualizarPrecioProducto(producto); */
+            producto.precio -= producto.precio / producto.cantidad;
             producto.cantidad--;
         } else {
             carritoProductos.splice(index, 1);
@@ -76,17 +73,6 @@ carrito.addEventListener('click', (event) => {
         });
     }
 });
-
-
-/* function actualizarPrecioProducto(producto) {
-    const precioProducto = producto.precio / producto.cantidad;  ///// ¡¡¡aca error!!
-    producto.precio = precioProducto.toFixed(2);
-    const precioProductoString = `Precio: $${precioProducto.toFixed(2)}`;
-    const precioProductoElemento = document.querySelector(`.producto-carrito .precio[data-id="${producto.id}"]`);
-    precioProductoElemento.textContent = precioProductoString;
-}
- */
-
 
 //confirmar compra con promise
 const botonComprar = document.querySelector("#confirmarCompra");

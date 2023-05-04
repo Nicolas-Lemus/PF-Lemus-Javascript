@@ -1,12 +1,14 @@
 //convertimos OBJETO calzados en archivo data.json 
+
 // ../data/data.json
+
 //filtrado por precio
 const inputPrecioMaximo = document.getElementById('precioMaximo');
 inputPrecioMaximo.addEventListener('input', function() {
     const precioMaximo = parseInt(this.value);
     filtrarPorPrecio(precioMaximo);
 });
-//mostramos card de precios
+
 const productos = document.querySelectorAll('.card');
 function filtrarPorPrecio(precioMaximo) {
     for (let i = 0; i < productos.length; i++) {
@@ -28,10 +30,12 @@ const contadorCarrito = document.querySelector('#valorCarrito');
 const precioTotal = document.querySelector('#precioTotal');
 let cantidadProductos = 0;
 let carritoProductos = [];
-//async
+
+//ASYNC
 const getCalzados = async () => {
     const response = await fetch("../data/dataCalzados.json");
     const calzados = await response.json();
+
 //filtro de tipo
     const buscadorTipo = document.querySelector("#buscarTipo");
     let tipoBuscado = "";
@@ -53,6 +57,7 @@ const getCalzados = async () => {
             }
         }
     });
+
 //filtro de nombre
     const buscadorNombre = document.querySelector("#buscar");
     buscadorNombre.addEventListener("keyup", e => {
@@ -77,19 +82,20 @@ const getCalzados = async () => {
 //llamamos a la promesa
 getCalzados();
 
+//VERIFICAR PRODUCTOS DE LOCALSTORAGE
 if (localStorage.getItem('carritoProductos')){
     carritoProductos = JSON.parse(localStorage.getItem('carritoProductos'));
     cantidadProductos = parseInt(localStorage.getItem('cantidadProductos'));
     actualizarCarrito();
     actualizarPrecioTotal();
 }
-
+//GUARDAR PRODUCTOS EN LOCALSTORAGE
 function guardarProductosEnLocalStorage() {
     localStorage.setItem('carritoProductos',JSON.stringify(carritoProductos));
     localStorage.setItem('cantidadProductos', cantidadProductos);
 } 
 
-
+//ACTUALIZAR CARRITO
 function actualizarCarrito() {
     carrito.innerHTML = '';
     let cantidadTotalProductos = 0;
@@ -129,7 +135,7 @@ productosTalles.forEach((producto) => {
             talleSeleccionado = botonTalle.textContent;
         });
     });
-
+   //SELECCIONAR TALLE PARA AGREGAR
     const botonTarjeta = producto.querySelector('.btn-primary');
     botonTarjeta.addEventListener('click', () => {
         if (!talleSeleccionado) {
@@ -163,7 +169,7 @@ productosTalles.forEach((producto) => {
         contadorCarrito.textContent = cantidadProductos;
     });
 })
-
+//AGREGAR PRODUCTOS AL CARRITO
 function agregarProductoAlCarrito(nombreProducto,precioProducto, talleSeleccionado, imgProducto) {
     // Buscar si el producto ya existe en el carrito 
     const productoExistente = carritoProductos.find(producto => producto.nombre === nombreProducto && producto.talle === talleSeleccionado);
@@ -186,7 +192,7 @@ function agregarProductoAlCarrito(nombreProducto,precioProducto, talleSelecciona
     actualizarPrecioTotal();
     guardarProductosEnLocalStorage();
 }
-
+//ACTUALIZAR PRECIO TOTAL
 function actualizarPrecioTotal() {
     let precioTotalCarrito = 0;
     const preciosProductos = document.querySelectorAll('.precio');
@@ -198,3 +204,33 @@ function actualizarPrecioTotal() {
     });
     precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
 }
+//ZOOM IMAGENES
+const imagenesProducto = document.querySelectorAll('.card-img-top');
+imagenesProducto.forEach((imagen) => {
+    imagen.addEventListener('click', () => {
+    const imageUrl = imagen.src;
+        Swal.fire({
+            title: imagen.alt,
+            imageUrl: imageUrl,
+            imageWidth: 800,
+            imageHeight: 400,
+            imageAlt: 'Imagen de producto ampliada',
+        });
+    });
+});
+//CERRAR SECCION
+const finalizarSeccion =document.querySelector("#cerrarSeccion");
+finalizarSeccion.addEventListener("click", ()=>{
+    Swal.fire({
+        title:'¡Seccion Finalizada con Exito!'+ '¡Gracias!',
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        }
+    })
+    .then(() => {
+        window.location.href = "../index.html";
+    });
+});
