@@ -32,7 +32,7 @@ function actualizarCarrito() {
             <img src="${producto.img}"class="imgCarrito">
             <span class="nombre">${producto.nombre}</span>
             <span class="talle">Talle ${producto.talle}</span>
-            <span class="precio" data-id="${producto.id}">${parseFloat(producto.precio)}</span>
+            <span class="precio" data-id="${producto.id}">${producto.precio}</span>
             <button class="eliminar-producto" data-index="${index}">X</button>
         `;
         carrito.appendChild(li);
@@ -40,14 +40,27 @@ function actualizarCarrito() {
     contadorCarrito.textContent = cantidadTotalProductos;
 }
 
+function actualizarPrecioTotal() {
+    let precioTotalCarrito = 0;
+
+    const preciosProductos = document.querySelectorAll('.precio');
+    preciosProductos.forEach(precioProducto => {
+        const precioProductoNumerico = parseFloat(precioProducto.textContent.replace('Precio: $', ''));
+        if (!isNaN(precioProductoNumerico)) {
+            precioTotalCarrito += precioProductoNumerico;
+        }
+    });
+    precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
+}
 
 carrito.addEventListener('click', (event) => {
     if (event.target.classList.contains('eliminar-producto')) {
         const index = event.target.dataset.index;
         const producto = carritoProductos[index];
         if (producto.cantidad > 1) {
+            producto.precio = producto.cantidad / producto.precio;
+            /* actualizarPrecioProducto(producto); */
             producto.cantidad--;
-            actualizarPrecioProducto(producto);
         } else {
             carritoProductos.splice(index, 1);
         }
@@ -64,24 +77,15 @@ carrito.addEventListener('click', (event) => {
     }
 });
 
-function actualizarPrecioProducto(producto) {
-    const precioProducto = producto.precio / producto.cantidad;
+
+/* function actualizarPrecioProducto(producto) {
+    const precioProducto = producto.precio / producto.cantidad;  ///// ¡¡¡aca error!!
+    producto.precio = precioProducto.toFixed(2);
     const precioProductoString = `Precio: $${precioProducto.toFixed(2)}`;
     const precioProductoElemento = document.querySelector(`.producto-carrito .precio[data-id="${producto.id}"]`);
     precioProductoElemento.textContent = precioProductoString;
 }
-
-function actualizarPrecioTotal() {
-    let precioTotalCarrito = 0;
-    const preciosProductos = document.querySelectorAll('.precio');
-    preciosProductos.forEach(precioProducto => {
-        const precioProductoNumerico = parseFloat(precioProducto.textContent.replace('Precio: $', ''));
-        if (!isNaN(precioProductoNumerico)) {
-            precioTotalCarrito += precioProductoNumerico;
-        }
-    });
-    precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
-}
+ */
 
 
 //confirmar compra con promise

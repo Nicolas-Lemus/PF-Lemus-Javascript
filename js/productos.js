@@ -102,7 +102,7 @@ function actualizarCarrito() {
             <img src="${producto.img}"class="imgCarrito">
             <span class="nombre">${producto.nombre}</span>
             <span class="talle">Talle ${producto.talle}</span>
-            <span class="precio" data-id="${producto.id}">${parseFloat(producto.precio)}</span>
+            <span class="precio" data-id="${producto.id}">${producto.precio}</span>
             <button class="eliminar-producto" data-index="${index}">X</button>
         `;
         carrito.appendChild(li);
@@ -163,20 +163,6 @@ productosTalles.forEach((producto) => {
         contadorCarrito.textContent = cantidadProductos;
     });
 })
-
-function actualizarPrecioTotal() {
-    let precioTotalCarrito = 0;
-
-    const preciosProductos = document.querySelectorAll('.precio');
-    preciosProductos.forEach(precioProducto => {
-        const precioProductoNumerico = parseFloat(precioProducto.textContent.replace('Precio: $', ''));
-        if (!isNaN(precioProductoNumerico)) {
-            precioTotalCarrito += precioProductoNumerico;
-        }
-    });
-    precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
-}
-
 
 function agregarProductoAlCarrito(nombreProducto,precioProducto, talleSeleccionado, imgProducto) {
     // Buscar si el producto ya existe en el carrito 
