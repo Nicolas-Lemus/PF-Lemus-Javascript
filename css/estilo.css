@@ -1882,6 +1882,10 @@ footer .footer__nav p {
   padding: 0.5rem;
   align-items: center;
 }
+.listado li .cantidad {
+  font-size: 2rem;
+  padding: 1rem;
+}
 .listado li .imgCarrito {
   width: 60px;
   height: 60px;

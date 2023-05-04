@@ -31,9 +31,9 @@
     },
     {
         "id":"list-item-6",
-        "nombre":"Botas",
-        "precio":5000,
-        "tipo":"Casual"
+        "nombre":"Reebok",
+        "precio":4500,
+        "tipo":"deportivo"
     },
     {
         "id":"list-item-7",

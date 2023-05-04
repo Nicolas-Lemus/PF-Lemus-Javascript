@@ -1,25 +1,24 @@
 const talles = [40, 41, 42, 43, 44];
-//querySelector
+
 const productosTalles = document.querySelectorAll('.card');
 const carrito = document.querySelector('.listado');
 const contadorCarrito = document.querySelector('#valorCarrito');
 const precioTotal = document.querySelector('#precioTotal');
-//variables
+
 let cantidadProductos = 0;
 let carritoProductos = [];
-// Comprobar si hay datos en el Local Storage
+
 if (localStorage.getItem('carritoProductos')){
     carritoProductos = JSON.parse(localStorage.getItem('carritoProductos'));
-    cantidadProductos = carritoProductos.length;
+    cantidadProductos = carritoProductos.reduce((total, producto) => total + producto.cantidad, 0);
     actualizarCarrito();
     actualizarPrecioTotal();
 }
-//guardar en localStorage
+
 function guardarProductosEnLocalStorage() {
     localStorage.setItem('carritoProductos',JSON.stringify(carritoProductos));
     localStorage.setItem('cantidadProductos', cantidadProductos);
 }
-
 
 function actualizarCarrito() {
     carrito.innerHTML = '';
@@ -33,7 +32,7 @@ function actualizarCarrito() {
             <img src="${producto.img}"class="imgCarrito">
             <span class="nombre">${producto.nombre}</span>
             <span class="talle">Talle ${producto.talle}</span>
-            <span class="precio">${producto.precio}</span>
+            <span class="precio" data-id="${producto.id}">${parseFloat(producto.precio)}</span>
             <button class="eliminar-producto" data-index="${index}">X</button>
         `;
         carrito.appendChild(li);
@@ -41,7 +40,37 @@ function actualizarCarrito() {
     contadorCarrito.textContent = cantidadTotalProductos;
 }
 
-//actualizar precio total
+
+carrito.addEventListener('click', (event) => {
+    if (event.target.classList.contains('eliminar-producto')) {
+        const index = event.target.dataset.index;
+        const producto = carritoProductos[index];
+        if (producto.cantidad > 1) {
+            producto.cantidad--;
+            actualizarPrecioProducto(producto);
+        } else {
+            carritoProductos.splice(index, 1);
+        }
+        cantidadProductos--;
+        guardarProductosEnLocalStorage();
+        actualizarCarrito();
+        actualizarPrecioTotal();
+        Swal.fire({
+            icon: "error",
+            title: "Elemento Borrado",
+            showConfirmButton: false,
+            timer: 1500,
+        });
+    }
+});
+
+function actualizarPrecioProducto(producto) {
+    const precioProducto = producto.precio / producto.cantidad;
+    const precioProductoString = `Precio: $${precioProducto.toFixed(2)}`;
+    const precioProductoElemento = document.querySelector(`.producto-carrito .precio[data-id="${producto.id}"]`);
+    precioProductoElemento.textContent = precioProductoString;
+}
+
 function actualizarPrecioTotal() {
     let precioTotalCarrito = 0;
     const preciosProductos = document.querySelectorAll('.precio');
@@ -53,31 +82,6 @@ function actualizarPrecioTotal() {
     });
     precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
 }
-
-//Borrar producto del carrito y de localStorage
-
-carrito.addEventListener('click', (event) => {
-    if (event.target.classList.contains('eliminar-producto')) {
-        const index = event.target.dataset.index;
-        const producto = carritoProductos[index];
-        if (producto.cantidad > 1) {
-            producto.cantidad --;
-            carritoProductos.splice(index, 1, producto);
-        }else {
-            carritoProductos.splice(index, 1);
-        }
-        Swal.fire({
-            icon: "error",
-            title: "Elemento Borrado",
-            showConfirmButton: false,
-            timer: 1500,
-        });
-        cantidadProductos--;
-        guardarProductosEnLocalStorage();
-        actualizarCarrito();
-        actualizarPrecioTotal();
-    }
-});
 
 
 //confirmar compra con promise
@@ -126,8 +130,6 @@ botonComprar.addEventListener("click", () => {
         });
     });
 });
-
-
 //CERRAR SECCION
 const finalizarSeccion =document.querySelector("#cerrarSeccion");
 finalizarSeccion.addEventListener("click", ()=>{

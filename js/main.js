@@ -1,5 +1,3 @@
-
-
 /// INICIO DE SECCION 
 const formInicio = document.querySelector('#formularioInicio'),
     apellidoInput = document.querySelector('#apellido'),
@@ -42,4 +40,3 @@ formInicio.addEventListener('submit',function(e){
     },3000)
     }
 });
-

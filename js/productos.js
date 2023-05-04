@@ -76,44 +76,50 @@ const getCalzados = async () => {
 };
 //llamamos a la promesa
 getCalzados();
-// Comprobar si hay datos en el Local Storage
+
 if (localStorage.getItem('carritoProductos')){
     carritoProductos = JSON.parse(localStorage.getItem('carritoProductos'));
-    cantidadProductos = carritoProductos.length;
+    cantidadProductos = parseInt(localStorage.getItem('cantidadProductos'));
     actualizarCarrito();
     actualizarPrecioTotal();
 }
-//guardar localStorage
+
 function guardarProductosEnLocalStorage() {
     localStorage.setItem('carritoProductos',JSON.stringify(carritoProductos));
     localStorage.setItem('cantidadProductos', cantidadProductos);
 } 
-//funcion actualizar carrito
+
+
 function actualizarCarrito() {
     carrito.innerHTML = '';
+    let cantidadTotalProductos = 0;
     carritoProductos.forEach((producto, index) => {
+        cantidadTotalProductos += producto.cantidad;
         const li = document.createElement('li');
         li.classList.add('producto-carrito');
         li.innerHTML = `
+            <span class="cantidad">${producto.cantidad}</span>
             <img src="${producto.img}"class="imgCarrito">
             <span class="nombre">${producto.nombre}</span>
             <span class="talle">Talle ${producto.talle}</span>
-            <span class="precio">${producto.precio}</span>
+            <span class="precio" data-id="${producto.id}">${parseFloat(producto.precio)}</span>
             <button class="eliminar-producto" data-index="${index}">X</button>
         `;
         carrito.appendChild(li);
     });
-    contadorCarrito.textContent = cantidadProductos;
+    contadorCarrito.textContent = cantidadTotalProductos;
 }
-//selecionar talle para agregar al carrito
+
+
 productosTalles.forEach((producto) => {
     const nombreProducto = producto.querySelector('.card-title').textContent;
-    const precioProducto = producto.querySelector('.card-text').textContent;
+    const precioProducto = parseFloat(producto.querySelector('.card-text').textContent.replace('Precio: $',''));
     const botonesTalles = producto.querySelectorAll('.btn-outline-secondary');
     const imgProducto = producto.querySelector(".card-img-top").src;
+
     let talleSeleccionado;
-    let cantidad =0;
-    //evento click remover seleccion de talle
+    
+
     botonesTalles.forEach(botonTalle => {
         botonTalle.addEventListener('click', () => {
             botonesTalles.forEach(boton => {
@@ -123,17 +129,19 @@ productosTalles.forEach((producto) => {
             talleSeleccionado = botonTalle.textContent;
         });
     });
-//funcion  agregar al carrito si selecciono talle
+
     const botonTarjeta = producto.querySelector('.btn-primary');
     botonTarjeta.addEventListener('click', () => {
         if (!talleSeleccionado) {
             Swal.fire({
-                position: 'center',
-                icon: 'error',
-                title: 'Ingrese talle',
-                showConfirmButton: false,
-                timer: 1200
-            })
+                title: 'Ingrese Talle',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            });
             return;
         }
         Swal.fire({
@@ -141,38 +149,58 @@ productosTalles.forEach((producto) => {
             icon: 'success',
             title: 'Producto Agregado',
             showConfirmButton: false,
-            timer: 1200
+            timer: 1000
         })
-        const productoSeleccionado = {
-            nombre: nombreProducto,
-            precio:precioProducto,
-            talle: talleSeleccionado,
-            img: imgProducto,
-            cantidad:cantidad
-        };
-        carritoProductos.push(productoSeleccionado);
+        agregarProductoAlCarrito(nombreProducto, precioProducto, talleSeleccionado, imgProducto)
         guardarProductosEnLocalStorage();
-        const index = carritoProductos.length - 1;
-        const li = document.createElement('li');
-        li.classList.add('producto-carrito');
-        li.innerHTML = `
-            <img src="${imgProducto}"class="imgCarrito">
-            <span class="nombre">${nombreProducto}</span>
-            <span class="talle">Talle ${talleSeleccionado}</span>
-            <span class="precio">${precioProducto}</span>
-            <button class="eliminar-producto" data-index="${index}">X</button>
-        `;
-        carrito.appendChild(li);
+        actualizarCarrito();
+        actualizarPrecioTotal();
         talleSeleccionado = null;
         botonesTalles.forEach(boton => {
             boton.classList.remove('seleccionado');
         });
         cantidadProductos++;
         contadorCarrito.textContent = cantidadProductos;
-        actualizarPrecioTotal();
     });
-});
-//ACTUALIZAR PRECIO TOTAL
+})
+
+function actualizarPrecioTotal() {
+    let precioTotalCarrito = 0;
+
+    const preciosProductos = document.querySelectorAll('.precio');
+    preciosProductos.forEach(precioProducto => {
+        const precioProductoNumerico = parseFloat(precioProducto.textContent.replace('Precio: $', ''));
+        if (!isNaN(precioProductoNumerico)) {
+            precioTotalCarrito += precioProductoNumerico;
+        }
+    });
+    precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
+}
+
+
+function agregarProductoAlCarrito(nombreProducto,precioProducto, talleSeleccionado, imgProducto) {
+    // Buscar si el producto ya existe en el carrito 
+    const productoExistente = carritoProductos.find(producto => producto.nombre === nombreProducto && producto.talle === talleSeleccionado);
+    
+    if (productoExistente) {
+        // Si el producto ya existe, sumar 1 a la cantidad y actualizar el precio
+        productoExistente.cantidad++;
+        productoExistente.precio = productoExistente.cantidad * parseFloat(precioProducto);
+    } else {
+        // Si el producto no existe, agregarlo al carrito
+        carritoProductos.push({
+            nombre: nombreProducto,
+            precio:parseFloat(precioProducto),
+            talle: talleSeleccionado,
+            img: imgProducto,
+            cantidad: 1
+        });
+    }
+    actualizarCarrito();
+    actualizarPrecioTotal();
+    guardarProductosEnLocalStorage();
+}
+
 function actualizarPrecioTotal() {
     let precioTotalCarrito = 0;
     const preciosProductos = document.querySelectorAll('.precio');
@@ -184,47 +212,3 @@ function actualizarPrecioTotal() {
     });
     precioTotal.textContent  = `$${precioTotalCarrito.toFixed(2)}`;
 }
-//agregar productos al carrito
-function agregarProductoAlCarrito(nombreProducto, precioProducto, talleSeleccionado, imgProducto) {
-        carritoProductos.push({
-            nombre: nombreProducto,
-            precio:parseFloat(precioProducto),
-            talle: talleSeleccionado,
-            img: imgProducto
-        });
-// Actualizar la cantidad de productos y el precio total en el carrito
-    cantidadProductos++;
-    actualizarCarrito();
-    actualizarPrecioTotal();
-    guardarProductosEnLocalStorage();
-}
-//efecto imagenes zoom
-const imagenesProducto = document.querySelectorAll('.card-img-top');
-imagenesProducto.forEach((imagen) => {
-    imagen.addEventListener('click', () => {
-    const imageUrl = imagen.src;
-        Swal.fire({
-            title: imagen.alt,
-            imageUrl: imageUrl,
-            imageWidth: 800,
-            imageHeight: 400,
-            imageAlt: 'Imagen de producto ampliada',
-        });
-    });
-});
-//CERRAR SECCION
-const finalizarSeccion =document.querySelector("#cerrarSeccion");
-finalizarSeccion.addEventListener("click", ()=>{
-    Swal.fire({
-        title:'¡Seccion Finalizada con Exito!'+ '¡Gracias!',
-        showClass: {
-            popup: 'animate__animated animate__fadeInDown'
-        },
-        hideClass: {
-            popup: 'animate__animated animate__fadeOutUp'
-        }
-    })
-    .then(() => {
-        window.location.href = "../index.html";
-    });
-})
